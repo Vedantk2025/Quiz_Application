@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code or 'Notice' }} — Quiz Application{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-icon-box">
+            <span class="error-large-icon">⚠️</span>
+        </div>
+        <span class="error-status-code">{{ error_code or 'Notice' }}</span>
+        <h1 class="error-title">{{ error_title or 'Something Went Wrong' }}</h1>
+        <p class="error-description">
+            {{ error_message or 'An unexpected situation occurred while processing your quiz request.' }}
+        </p>
+
+        <div class="error-actions">
+            <a href="{{ url_for('quiz_bp.index') }}" class="btn btn-primary btn-lg">
+                <span>🏠 Return to Home</span>
+            </a>
+            <a href="{{ url_for('quiz_bp.restart') }}" class="btn btn-secondary btn-lg">
+                <span>🔄 Restart Fresh Quiz</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

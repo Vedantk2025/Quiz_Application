@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Python Flask SQLite Quiz Application with Difficulty Selection, Timer, and Scoring.">
+    <title>{% block title %}Quiz Application — Feature Set B{% endblock %}</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="{{ url_for('quiz_bp.index') }}" class="brand-logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">Quiz<span class="highlight">Master</span></span>
+            </a>
+            <div class="header-meta">
+                <span class="tech-badge">Python • Flask • SQLite</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Notifications Container -->
+    <div class="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} fade-in">
+                        <span class="alert-icon">
+                            {% if category == 'danger' %}⚠️
+                            {% elif category == 'warning' %}🔔
+                            {% elif category == 'success' %}✅
+                            {% else %}ℹ️{% endif %}
+                        </span>
+                        <span class="alert-text">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p><strong>Quiz Application — Feature Set B</strong> | BCA 3rd Semester Python Project</p>
+            <p class="footer-sub">Built with Python 3, Flask, and SQLite. Fully responsive client & secure server validation.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

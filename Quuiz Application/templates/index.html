@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Application — Select Difficulty & Start{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="hero-section">
+        <div class="badge-pill">BCA Python Assignment</div>
+        <h1 class="hero-title">Interactive <span class="gradient-text">Python Quiz</span></h1>
+        <p class="hero-subtitle">
+            Test your knowledge by selecting a difficulty level and answering randomly selected questions within the given time limit.
+        </p>
+    </div>
+
+    <!-- Active Quiz Notice if in session -->
+    {% if quiz_in_progress %}
+    <div class="in-progress-card">
+        <div class="notice-content">
+            <span class="pulse-dot"></span>
+            <div>
+                <strong>You have an active quiz session in progress!</strong>
+                <p>You can resume your current attempt or reset to start anew.</p>
+            </div>
+        </div>
+        <div class="notice-actions">
+            <a href="{{ url_for('quiz_bp.quiz') }}" class="btn btn-secondary btn-sm">Resume Quiz</a>
+            <a href="{{ url_for('quiz_bp.restart') }}" class="btn btn-outline btn-sm">Reset</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Quiz Setup Form -->
+    <form action="{{ url_for('quiz_bp.start_quiz') }}" method="POST" id="startQuizForm" class="setup-card">
+        
+        <!-- Step 1: Difficulty Selection -->
+        <div class="section-block">
+            <div class="section-header">
+                <span class="step-badge">1</span>
+                <h2>Select Difficulty Level</h2>
+            </div>
+            <p class="section-desc">Choose a difficulty tier. Questions are randomly sampled from the database according to your choice.</p>
+
+            <div class="difficulty-grid">
+                <!-- Easy Option -->
+                <label class="difficulty-card" for="diff_easy">
+                    <input type="radio" name="difficulty" id="diff_easy" value="easy" required>
+                    <div class="card-inner">
+                        <div class="diff-icon diff-easy">🟢</div>
+                        <div class="diff-info">
+                            <span class="diff-title">Easy</span>
+                            <span class="diff-desc">Python fundamentals, syntax, basic types & concepts.</span>
+                        </div>
+                        <span class="select-indicator"></span>
+                    </div>
+                </label>
+
+                <!-- Medium Option -->
+                <label class="difficulty-card" for="diff_medium">
+                    <input type="radio" name="difficulty" id="diff_medium" value="medium">
+                    <div class="card-inner">
+                        <div class="diff-icon diff-medium">🟡</div>
+                        <div class="diff-info">
+                            <span class="diff-title">Medium</span>
+                            <span class="diff-desc">Data structures, Flask concepts, SQLite & algorithms.</span>
+                        </div>
+                        <span class="select-indicator"></span>
+                    </div>
+                </label>
+
+                <!-- Hard Option -->
+                <label class="difficulty-card" for="diff_hard">
+                    <input type="radio" name="difficulty" id="diff_hard" value="hard">
+                    <div class="card-inner">
+                        <div class="diff-icon diff-hard">🔴</div>
+                        <div class="diff-info">
+                            <span class="diff-title">Hard</span>
+                            <span class="diff-desc">Advanced Python internals (GIL, MRO, slots) & concurrency.</span>
+                        </div>
+                        <span class="select-indicator"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Quiz Rules & Specs -->
+        <div class="section-block">
+            <div class="section-header">
+                <span class="step-badge">2</span>
+                <h2>Quiz Rules & Parameters</h2>
+            </div>
+
+            <div class="rules-grid">
+                <div class="rule-box">
+                    <div class="rule-icon">❓</div>
+                    <div class="rule-meta">
+                        <span class="rule-label">Questions</span>
+                        <span class="rule-value">{{ question_count }} Questions</span>
+                    </div>
+                </div>
+                <div class="rule-box">
+                    <div class="rule-icon">⏱️</div>
+                    <div class="rule-meta">
+                        <span class="rule-label">Time Limit</span>
+                        <span class="rule-value">{{ time_limit }} Seconds</span>
+                    </div>
+                </div>
+                <div class="rule-box">
+                    <div class="rule-icon">🎯</div>
+                    <div class="rule-meta">
+                        <span class="rule-label">Scoring System</span>
+                        <span class="rule-value">+1 Mark per correct</span>
+                    </div>
+                </div>
+                <div class="rule-box">
+                    <div class="rule-icon">🔄</div>
+                    <div class="rule-meta">
+                        <span class="rule-label">Randomization</span>
+                        <span class="rule-value">Unique set each attempt</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button Area -->
+        <div class="form-actions">
+            <button type="submit" id="startQuizBtn" class="btn btn-primary btn-lg btn-block" disabled>
+                <span>Select Difficulty to Start Quiz</span>
+                <span class="btn-arrow">→</span>
+            </button>
+            <p id="selectionNotice" class="selection-hint">Please click on one of the difficulty cards above to proceed.</p>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const radios = document.querySelectorAll('input[name="difficulty"]');
+        const submitBtn = document.getElementById("startQuizBtn");
+        const hint = document.getElementById("selectionNotice");
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                if (radio.checked) {
+                    submitBtn.disabled = false;
+                    const diffName = radio.value.charAt(0).toUpperCase() + radio.value.slice(1);
+                    submitBtn.querySelector("span").textContent = `Start ${diffName} Quiz`;
+                    hint.textContent = `Selected: ${diffName} Difficulty (10 Random Questions, 60s)`;
+                    hint.classList.add("active");
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

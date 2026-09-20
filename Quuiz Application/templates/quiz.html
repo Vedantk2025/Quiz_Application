@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz in Progress ({{ difficulty }}) — QuizMaster{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    
+    <!-- Top Quiz Header Bar (Difficulty, Progress & Timer) -->
+    <div class="quiz-top-bar">
+        <div class="bar-left">
+            <span class="diff-tag diff-{{ difficulty|lower }}">{{ difficulty }}</span>
+            <span class="question-tracker">
+                Question <span id="currentQuestionNumber">1</span> of {{ total_questions }}
+            </span>
+        </div>
+
+        <div class="bar-right">
+            <div class="timer-pill" id="timerBadge" data-remaining="{{ remaining_time }}" data-total="{{ time_limit }}">
+                <span class="timer-icon">⏱️</span>
+                <span class="timer-label">Time Remaining:</span>
+                <span class="timer-countdown" id="timerCountdown">{{ remaining_time }}s</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Progress Bar -->
+    <div class="progress-track">
+        <div class="progress-fill" id="quizProgressBar" style="width: 10%;"></div>
+    </div>
+
+    <!-- Question Jump Navigator -->
+    <div class="question-navigator" aria-label="Question Navigation">
+        {% for q in questions %}
+        <button type="button" class="nav-dot {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}" id="navDot-{{ q.id }}">
+            {{ loop.index }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Main Quiz Form -->
+    <form id="quizForm" action="{{ url_for('result_bp.submit_quiz') }}" method="POST">
+        
+        <!-- Questions Carousel/Slides Container -->
+        <div class="questions-deck">
+            {% for q in questions %}
+            {% set q_index = loop.index0 %}
+            <div class="question-card {% if loop.first %}active-question{% endif %}" id="qCard-{{ q_index }}" data-question-id="{{ q.id }}" data-index="{{ q_index }}">
+                
+                <div class="card-meta">
+                    <span class="category-pill">{{ q.category or 'General' }}</span>
+                    <span class="q-seq">#{{ loop.index }}</span>
+                </div>
+
+                <h2 class="question-text">{{ q.question_text }}</h2>
+
+                <!-- Options List (Randomized Order) -->
+                <div class="options-group">
+                    {% for opt in q.options %}
+                    <label class="option-label" for="opt-{{ q.id }}-{{ loop.index0 }}">
+                        <input type="radio" 
+                               name="answer_{{ q.id }}" 
+                               id="opt-{{ q.id }}-{{ loop.index0 }}" 
+                               value="{{ opt }}"
+                               class="quiz-radio"
+                               data-question-id="{{ q.id }}"
+                               data-index="{{ q_index }}">
+                        <div class="option-content">
+                            <span class="option-letter">
+                                {% if loop.index0 == 0 %}A
+                                {% elif loop.index0 == 1 %}B
+                                {% elif loop.index0 == 2 %}C
+                                {% else %}D{% endif %}
+                            </span>
+                            <span class="option-text">{{ opt }}</span>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Controls Footer -->
+        <div class="quiz-controls">
+            <button type="button" id="prevBtn" class="btn btn-secondary" disabled>
+                ← Previous
+            </button>
+
+            <div class="controls-center">
+                <span class="answered-counter" id="answeredCounter">0 of {{ total_questions }} answered</span>
+            </div>
+
+            <div class="controls-right">
+                <button type="button" id="nextBtn" class="btn btn-primary">
+                    Next →
+                </button>
+                <button type="submit" id="submitQuizBtn" class="btn btn-success">
+                    Submit Quiz 🚀
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!-- Modal confirmation dialog if submitting with unanswered questions -->
+<div class="modal-backdrop" id="unansweredModal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <span class="modal-icon">⚠️</span>
+            <h3>Unanswered Questions</h3>
+        </div>
+        <div class="modal-body">
+            <p>You have <strong id="unansweredModalCount">0</strong> unanswered question(s). Are you sure you want to submit now?</p>
+            <p class="text-muted">Unanswered questions receive 0 marks.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelModalBtn" class="btn btn-secondary">Review Questions</button>
+            <button type="button" id="confirmSubmitBtn" class="btn btn-danger">Submit Anyway</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+{% endblock %}

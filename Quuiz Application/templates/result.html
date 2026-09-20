@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results — Score {{ result.score }}/{{ result.total_questions }} — QuizMaster{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    
+    <!-- Hero Score Summary Card -->
+    <div class="result-hero-card">
+        <div class="hero-top">
+            <span class="diff-tag diff-{{ result.difficulty|lower }}">{{ result.difficulty }} Difficulty</span>
+            <span class="completion-stamp">Quiz Completed</span>
+        </div>
+
+        <h1 class="result-title">Quiz Results</h1>
+
+        <div class="score-display-wrapper">
+            <div class="score-circle">
+                <span class="score-large">{{ result.score }}</span>
+                <span class="score-divider">/</span>
+                <span class="score-total">{{ result.total_questions }}</span>
+            </div>
+            <div class="percentage-badge badge-{{ result.feedback.badge_color }}">
+                {{ result.percentage }}%
+            </div>
+        </div>
+
+        <!-- Performance Feedback Banner -->
+        <div class="performance-card feedback-{{ result.feedback.tier }}">
+            <h3 class="feedback-title">{{ result.feedback.title }}</h3>
+            <p class="feedback-message">{{ result.feedback.message }}</p>
+        </div>
+    </div>
+
+    <!-- 4-Column Stat Breakdown Grid -->
+    <div class="stats-grid">
+        <div class="stat-card stat-correct">
+            <div class="stat-icon">✅</div>
+            <div class="stat-meta">
+                <span class="stat-val">{{ result.correct_answers }}</span>
+                <span class="stat-lbl">Correct Answers (+1 pt each)</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-incorrect">
+            <div class="stat-icon">❌</div>
+            <div class="stat-meta">
+                <span class="stat-val">{{ result.incorrect_answers }}</span>
+                <span class="stat-lbl">Incorrect Answers (0 pts)</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-unanswered">
+            <div class="stat-icon">⊘</div>
+            <div class="stat-meta">
+                <span class="stat-val">{{ result.unanswered }}</span>
+                <span class="stat-lbl">Unanswered Questions (0 pts)</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-time">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-meta">
+                <span class="stat-val">{{ result.time_taken }}s</span>
+                <span class="stat-lbl">Total Time Taken</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="result-actions">
+        <a href="{{ url_for('quiz_bp.restart') }}" class="btn btn-primary btn-lg">
+            <span>🔄 Restart Quiz</span>
+        </a>
+        <a href="{{ url_for('quiz_bp.index') }}" class="btn btn-secondary btn-lg">
+            <span>🏠 Back to Home</span>
+        </a>
+    </div>
+
+    <!-- Question-by-Question Review Section -->
+    <div class="review-section">
+        <div class="review-header">
+            <h2>Detailed Question Review</h2>
+            <p>Review each question, your submitted response, and the correct answer.</p>
+        </div>
+
+        <div class="review-list">
+            {% for item in result.review %}
+            <div class="review-card review-{{ item.status }}">
+                <div class="review-card-top">
+                    <span class="review-q-num">Question {{ loop.index }} of {{ result.total_questions }}</span>
+                    
+                    {% if item.status == 'correct' %}
+                        <span class="review-badge badge-correct">✓ Correct</span>
+                    {% elif item.status == 'incorrect' %}
+                        <span class="review-badge badge-incorrect">✗ Incorrect</span>
+                    {% else %}
+                        <span class="review-badge badge-unanswered">⊘ Unanswered</span>
+                    {% endif %}
+                </div>
+
+                <h3 class="review-question-text">{{ item.question_text }}</h3>
+
+                <div class="review-answers-box">
+                    <div class="answer-row">
+                        <span class="answer-row-lbl">Your Answer:</span>
+                        <span class="answer-row-val user-val-{{ item.status }}">
+                            {{ item.user_answer }}
+                        </span>
+                    </div>
+
+                    {% if item.status != 'correct' %}
+                    <div class="answer-row">
+                        <span class="answer-row-lbl">Correct Answer:</span>
+                        <span class="answer-row-val correct-val">
+                            {{ item.correct_answer }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bottom Secondary Actions -->
+    <div class="result-bottom-actions">
+        <a href="{{ url_for('quiz_bp.restart') }}" class="btn btn-primary">
+            <span>🔄 Take Another Quiz</span>
+        </a>
+        <a href="{{ url_for('quiz_bp.index') }}" class="btn btn-outline">
+            <span>Change Difficulty</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
